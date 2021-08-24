@@ -6,22 +6,51 @@ document.body.appendChild(renderer.domElement);
 window.addEventListener('resize', resize, false);
 
 const tile_types = [
-    new TileType("seed", "seed", "#ffffaa", {
+    new TileType("seed", "seed", "#aaaaff", {
 	north: new Glue(2, "A"),
 	east: new Glue(2, "B")}),
 
     new TileType("Vertical", "V", "#ffaaff", {
+	north: new Glue(2, "A"),
+	east: new Glue(1, '1'),
 	south: new Glue(2, "A")}),
+
+    new TileType("Horizontal", "H", "#aaffff", {
+	north: new Glue(1, '0'),
+	east: new Glue(2, "B"),
+	west: new Glue(2, "B")}),
+
+    new TileType("Add 00", "0", "#cccccc", {
+	north: new Glue(1, "0"),
+	east: new Glue(1, "0"),
+	south: new Glue(1, "0"),
+	west: new Glue(1, "0")}),
+
+    new TileType("Add 01", "1", "#666666", {
+	north: new Glue(1, "1"),
+	east: new Glue(1, "0"),
+	south: new Glue(1, "0"),
+	west: new Glue(1, "1")}),
+
+    new TileType("Add 10", "1", "#666666", {
+	north: new Glue(1, "1"),
+	east: new Glue(1, "0"),
+	south: new Glue(1, "1"),
+	west: new Glue(1, "0")}),
+
+    new TileType("Add 11", "0", "#cccccc", {
+	north: new Glue(1, "0"),
+	east: new Glue(1, "1"),
+	south: new Glue(1, "1"),
+	west: new Glue(1, "1")}),
 ];
 
 system = new System(2, tile_types);
-system.step();
 
-camera.position.z = 2;
-camera.zoom = 0.5;
+camera.position.set(0, 0, 2);
 camera.updateProjectionMatrix();
 
-renderer.setClearColor(0x666666, 1);
+renderer.setClearColor(0xffffaa, 1);
 
 resize();
 animate();
@@ -37,6 +66,9 @@ function resize() {
 
 function animate() {
     requestAnimationFrame(animate);
+    
+    update();
+
     renderer.render(scene, camera);
 }
 
