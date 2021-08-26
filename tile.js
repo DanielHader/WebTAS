@@ -16,10 +16,10 @@ class TileType {
 	const bitmap = document.createElement('canvas');
 	const ctx = bitmap.getContext('2d');
 
-	const TEX_SIZE = 512;
+	const TEX_SIZE = 256;
 	const LINE_DASH = [5 * TEX_SIZE / 100, 3 * TEX_SIZE / 100];
 	const NAME_SIZE = TEX_SIZE / 10
-	const LABEL_SIZE = TEX_SIZE / 6;
+	const LABEL_SIZE = TEX_SIZE / 5;
 	const GLUE_SIZE = TEX_SIZE / 10;
 	const GLUE_OFFSET = TEX_SIZE / 5;
 	
@@ -33,10 +33,10 @@ class TileType {
 	ctx.textAlign = 'center';
 
 	ctx.font = `${LABEL_SIZE}px Arial`;
-	ctx.fillText(label, TEX_SIZE / 2, TEX_SIZE / 2);
+	ctx.fillText(label, TEX_SIZE / 2, 4 * TEX_SIZE / 7);
 
 	ctx.font = `${NAME_SIZE}px Arial`;
-	ctx.fillText(name, TEX_SIZE / 2, 3 * TEX_SIZE / 5);
+	ctx.fillText(name, TEX_SIZE / 2, 5 * TEX_SIZE / 7);
 
 	ctx.strokeStyle = 'black';
 	ctx.font = `${GLUE_SIZE}px Arial`;
@@ -101,6 +101,7 @@ class System {
 	this.temperature = temperature;
 	this.tile_types = tile_types;
 
+	this.tiles = [];
 	this.grid = new Map();
 	this.frontier = new Map();
 	this.fitting_tiles = new Map();
@@ -131,6 +132,8 @@ class System {
 	const tile = new Tile(this.tile_types[type_index], x, y);
 	if (seed) this.seed.push(tile);
 	else this.history.push(tile);
+
+	this.tiles.push(tile);
 	this.grid.set(coord, type_index);
 
 	this.removeFrontier(x, y);
@@ -210,7 +213,7 @@ class System {
 
 	return attachments;
     }
-    
+
     step() {
 	const attachments = this.getPossibleAttachments();
 
