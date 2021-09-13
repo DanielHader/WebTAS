@@ -2,7 +2,7 @@ const scene = new THREE.Scene();
 const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 1, 10);
 const renderer = new THREE.WebGLRenderer();
 
-document.body.appendChild(renderer.domElement);
+document.getElementById("simulator").appendChild(renderer.domElement);
 window.addEventListener('resize', resize, false);
 
 const tile_types = [
@@ -66,9 +66,29 @@ function resize() {
 
 function animate() {
     requestAnimationFrame(animate);
-    
-    update();
-
     renderer.render(scene, camera);
+}
+
+const NO_MENU = 0;
+const FILE_MENU = 1;
+const VIEW_MENU = 2;
+const SETTINGS_MENU = 3;
+
+let open_menu = NO_MENU;
+
+function dropdown(content_div) {
+    let open = false;
+    
+    function click() {
+	if (open) {
+	    content_div.className = content_div.className.replace(" w3-show", "");
+	    open = false;
+	} else {
+	    content_div.className += " w3-show";
+	    open = true;
+	}
+    }
+    
+    return click;
 }
 
