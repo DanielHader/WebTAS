@@ -1,4 +1,6 @@
 # WebTAS
-A tile assembly simulator for your browser.
 
-requires three.js
+Authors: Daniel Hader, Matthew Patitz
+
+A blazing fast tile-assembly simulator for your browser.
+
