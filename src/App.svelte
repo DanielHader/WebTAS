@@ -2,9 +2,9 @@
   import { onMount } from "svelte";
   import Split from "split-grid";
   
-  import Simulator from "./Simulator.svelte";
+  import SimulatorView from "./SimulatorView.svelte";
   import TileView from "./TileView.svelte";
-  import Log from "./Log.svelte";
+  import LogView from "./LogView.svelte";
 
   let editor_gutter;
   let log_gutter;
@@ -62,9 +62,9 @@
 <div id="container">
   
   <TileView />
-  <Simulator />
-  <Log />
-
+  <SimulatorView />
+  <LogView />
+  
   <div id="editor-gutter" bind:this={editor_gutter} class="gutter"></div>
   <div id="simulator-gutter" bind:this={simulator_gutter} class="gutter"></div>
   <div id="log-gutter" bind:this={log_gutter} class="gutter"></div>

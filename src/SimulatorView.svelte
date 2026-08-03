@@ -1,4 +1,44 @@
 <script>
+  import { onMount } from "svelte";
+
+  import * as THREE from "three"
+  
+  let canvas;
+  let renderer;
+  let scene = new THREE.Scene();
+  let camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 1, 10);
+  camera.position.z = 4;
+
+  // canvas dirty bit, when true next frame will re-render
+  let redrawFlag = true;
+  
+  function render() {
+      if (redrawFlag) {
+          redrawFlag = false;
+      }
+
+      renderer.render(scene, camera);
+  }
+  
+  onMount(() => {
+      renderer = new THREE.WebGLRenderer({
+          antialias: true,
+          canvas: canvas,
+          preserveDrawingBuffer: true,
+      });
+      renderer.setPixelRatio(window.devicePixelRatio);
+      renderer.setClearColor(0xffffee);
+
+      function frameLoop() {
+          requestAnimationFrame(frameLoop);
+          render();
+      }
+      frameLoop();
+      
+      return () => {
+          cancelAnimationFrame(frameLoop);
+      }
+  });
   
 </script>
 
@@ -16,7 +56,7 @@
     <button id="zoom-in-button" class="w3-bar-item w3-button w3-right"><span class="material-icons">zoom_in</span></button>
   </div>
   <div id="simulator">
-    <canvas id="sim-canvas"></canvas>
+    <canvas id="sim-canvas" bind:this={canvas}></canvas>
     <svg id="sim-canvas" width="100%" height="100%"></svg>
   </div>
   <div id="sim-info" class="w3-small w3-light-grey">Simulator</div>

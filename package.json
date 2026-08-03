@@ -19,6 +19,7 @@
     "vite": "^8.0.12"
   },
   "dependencies": {
-    "split-grid": "^1.0.11"
+    "split-grid": "^1.0.11",
+    "three": "^0.185.1"
   }
 }
