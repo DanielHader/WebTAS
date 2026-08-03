@@ -1,38 +1,30 @@
 <script>
   import { onMount } from "svelte";
   import Split from "split-grid";
+  
+  import Simulator from "./Simulator.svelte";
+  import TileView from "./TileView.svelte";
+  import Log from "./Log.svelte";
 
   let editor_gutter;
   let log_gutter;
   let simulator_gutter;
-  let tile_gutter;
+  //let tile_gutter;
   
   onMount(() => {
       const split = Split({
 	  rowGutters: [
-              {
-	          track: 1,
-	          element: document.getElementById("editor-gutter")
-	      },
-              {
-		  track: 3,
-		  element: document.getElementById("log-gutter")
-	      }
+              { track: 1, element: editor_gutter },
+              { track: 3, element: log_gutter }
           ],
-	  columnGutters: [
-              {
-	          track: 3,
-	          element: document.getElementById("simulator-gutter")
-	      },
-	      {
-		  track: 1,
-		  element: document.getElementById('tile-gutter')
-	      }
+          columnGutters: [
+              { track: 3, element: simulator_gutter },
+          //    { track: 1, element: tile_gutter }
           ],
-	  onDrag: (direction, track, gridTemplateStyle) => {
-              console.log("dragging");
+          onDrag: (direction, track, gridTemplateStyle) => {
+              // update simulator here
 	  }
-      })
+      });
 
       return () => { split.destroy(); };
   });
@@ -68,56 +60,14 @@
 </header>
 
 <div id="container">
-  <div id="tile-list-panel">
-    <div id="tile-list-header" class="w3-bar w3-green"><div class="w3-bar-item">Tile List</div></div>
-    <div id="tile-list">
-      <button id="new-tile-button" class="tile-list-entry w3-border w3-button w3-small w3-light-gray w3-hover-green w3-left-align">
-        <span class="material-icons w3-small">add_box</span> New Tile
-      </button>
-    </div>
-  </div>
-
-  <div id="tile-view-panel">
-    <div id="tile-view-header" class="w3-bar w3-green"><div class="w3-bar-item">Selected Tile</div></div>
-    <div id="tile-view">
-      <canvas id="tile-canvas"></canvas>
-    </div>
-  </div>
-
-  <div id="tile-properties-panel">
-    <div id="tile-properties-header" class="w3-bar w3-green"><div class="w3-bar-item">Tile Properties</div></div>
-    <div id="tile-properties"></div>
-  </div>
-
-  <div id="simulator-panel" style="width: 100%">
-    <div id="sim-bar" class="w3-bar w3-light-grey">
-      <button id="fast-back-button" class="w3-bar-item w3-button"><span class="material-icons">fast_rewind</span></button>
-      <button id="step-back-button" class="w3-bar-item w3-button"><span class="material-icons">skip_previous</span></button>
-      <button id="stop-button" class="w3-bar-item w3-button"><span class="material-icons">stop</span></button>
-      <button id="step-forward-button" class="w3-bar-item w3-button"><span class="material-icons">skip_next</span></button>
-      <button id="fast-forward-button" class="w3-bar-item w3-button"><span class="material-icons">fast_forward</span></button>
-      <div class="w3-bar-item bar-divider"></div>
-      <button id="select-mode-button" class="w3-bar-item w3-button"><span class="material-icons">highlight_alt</span></button>
-      <button id="place-mode-button" class="w3-bar-item w3-button"><span class="material-icons">edit</span></button>
-      <button id="zoom-out-button" class="w3-bar-item w3-button w3-right"><span class="material-icons">zoom_out</span></button>
-      <button id="zoom-in-button" class="w3-bar-item w3-button w3-right"><span class="material-icons">zoom_in</span></button>
-    </div>
-    <div id="simulator">
-      <canvas id="sim-canvas"></canvas>
-      <svg id="sim-canvas" width="100%" height="100%"></svg>
-    </div>
-    <div id="sim-info" class="w3-small w3-light-grey">Simulator</div>
-  </div>
   
-  <div id="log-panel">
-    <div id="log-header" class="w3-bar w3-green"><div class="w3-bar-item">Simulation Log</div></div>
-    <div id="log-container"></div>
-  </div>
+  <TileView />
+  <Simulator />
+  <Log />
 
   <div id="editor-gutter" bind:this={editor_gutter} class="gutter"></div>
   <div id="simulator-gutter" bind:this={simulator_gutter} class="gutter"></div>
   <div id="log-gutter" bind:this={log_gutter} class="gutter"></div>
-  <div id="tile-gutter" bind:this={tile_gutter} class="gutter"></div>
 </div>
 
 <style>
