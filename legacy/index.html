@@ -1,0 +1,321 @@
+<!doctype html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>WebTAS</title>
+    <link rel="stylesheet" href="styles/w3.css">
+    <link rel="stylesheet" href="styles/webtas.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="icon" type="image/png" href="assets/icons/webtas.png">
+    <script src="src/split-grid.min.js"></script>
+    <script type="module" src="src/webtas.mjs"></script>
+	  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/canvg/3.0.9/umd.min.js"></script>
+  </head>
+
+  <body>
+  	<header>
+      <div class="w3-bar w3-light-grey">
+				<span class="w3-bar-item w3-green"><span class="webtas-logo"><b>WebTAS</b></span></span>
+				<div class="w3-dropdown-hover">
+				  <button class="w3-button">File</button>
+				  <div class="w3-dropdown-content w3-bar-block w3-card-4">
+				    <button id="load-system-button" class="w3-bar-item w3-button">Load System</button>
+				    <input type="file" multiple="true" id="load-system-input" style="display: none;"/>
+				    <button id="save-system-button" class="w3-bar-item w3-button">Save System</button>
+					  <button id="save-png-button" class="w3-bar-item w3-button">Save Snapshot as PNG Image</button>
+					  <button id="save-svg-button" class="w3-bar-item w3-button">Save Assembly as SVG Image</button>
+				    <button id="open-example-button" class="w3-bar-item w3-button">Open Example</button>
+				  	<button id="create-rectilinear-button" class="w3-bar-item w3-button">Create Rectilinear System</button>
+				  </div>
+				</div>
+				<div class="w3-dropdown-hover">
+				  <button class="w3-button">Settings</button>
+				  <div class="w3-dropdown-content w3-bar-block w3-card-4">
+					  <button id="set-simulation-mode-menu" class="w3-bar-item w3-button">Set Simulation Mode</button>
+				    <button id="set-temperature-button" class="w3-bar-item w3-button">Set Temperature</button>
+					  <input id="report-nondeterminism-checkbox" name="report-nondeterminism-checkbox" type="checkbox" value="report-nondeterminism" checked />
+					<label for="report-nondeterminism-checkbox"> Report Nondeterminism</label>
+
+
+				    <button id="set-background-color-button" class="w3-bar-item w3-button">Set Background Color</button>
+				    <input id="bg-color-input" type="color" value="#ffffee" style="display: none;" />
+				  </div>
+				</div>
+				<div class="w3-dropdown-hover">
+				  <button class="w3-button">System</button>
+				  <div class="w3-dropdown-content w3-bar-block w3-card-4">
+				    <button id="reset-to-seed-button" class="w3-bar-item w3-button">Reset To Seed</button>
+				  </div>
+				</div>
+      </div>
+    </header>
+
+    <div id="create-rectilinear-modal" class="w3-modal">
+    	<div class="w3-modal-content w3-border w3-border-black">
+    		<div class="w3-container w3-green">
+    			<div class="w3-padding">Create Rectilinear System</div>
+    			<span id="create-rectilinear-close-button" class="w3-button w3-display-topright">&times;</span>
+    		</div>
+    		<div class="w3-container w3-padding">
+    			<h4>Growth Direction</h4>
+    			<select name="rl-growth-direction" id="rl-growth-direction">
+    				<option value="NE">Northeast (Inputs: South and West, outputs: North and East)</option>
+    				<option value="NW">Northwest (Inputs: South and East, outputs: North and West)</option>
+						<option value="SE">Southeast (Inputs: North and West, outputs: South and East)</option>
+						<option value="SW">Southwest (Inputs: North and East, outputs: South and West)</option>
+    			</select>
+    			<h4>Input Values</h4>
+    			<table>
+						<tr>
+							<td>Horizontal input values:</td>
+							<td><input size="10" value="0", id="rl-horz-input"> (as a comma separated list)</td>
+						</tr>
+						<tr>
+							<td>Vertical input values:</td>
+							<td><input size="10" value="0" id="rl-vert-input"> (as a comma separated list)</td>
+						</tr>
+					</table>
+
+					<button id='rl-reset-truth-table-button'>Reset Truth Table</button>
+					<select id='rl-input-values'>
+							<option value='rl-default-input'>Input From Above</option>
+							<option value='rl-sierpinski-input'>Sierpinski Triangle</option>
+							<option value='rl-binary-counter-input'>Binary Counter</option>
+					</select>
+					
+					<h4>Truth Table</h4>
+					<div id="rl-truth-table"></div>
+
+					<h4>Truth Table Function</h4>
+					<textarea id="rl-truth-table-function" rows="6" cols="80" spellcheck="false"></textarea>
+					<button id="rl-truth-table-function-button">Generate Truth Table From Function</button>
+
+					<h4>Boundary Tiles</h4>
+					<table>
+						<tr>
+							<td><b>Vertical</b></td>
+							<td>Output:</td><td><input size="5" value="0" id="rl-vert-boundary"></td>
+							<td>Color:</td><td><input size="5" value="White" id="rl-vert-boundary-color"></td>
+						</tr>
+						<tr>
+							<td><b>Horizontal</b></td>
+							<td>Output:</td><td><input size="5" value="0" id="rl-horz-boundary"></td>
+							<td>Color:</td><td><input size="5" value="White" id="rl-horz-boundary-color"></td>
+						</tr>
+					</table>
+					<button id='rl-generate-button'>Generate</button>
+    		</div>
+    	</div>
+   	</div>
+
+    <div id="examples-modal" class="w3-modal">
+      <div class="w3-modal-content w3-border w3-border-black">
+      	<div class="w3-container w3-green">
+      	  <div class="w3-padding">Open Example</div>
+      	  <span id="examples-close-button" class="w3-button w3-display-topright">&times;</span>
+      	</div>
+      	<div class="w3-container">
+	      <form class="w3-padding" onsubmit="event.preventDefault(); return false;">
+	      	<label>Select Example System</label>
+		    <select id="example-select" class="w3-select w3-border" name="option">
+		      <option value="sierpinski">Sierpinski Triangle</option>
+		      <option value="counter">Log Width Binary Counter</option>
+		      <option value="square6x6">6x6 Square</option>
+		      <option value="turing_machine">Turing Machine</option>
+		    </select>
+	      </form>
+      	</div>
+      	<div class="w3-container w3-green">
+      	  <button id="example-confirm-button" class="w3-button w3-right">Open</button>
+      	</div>
+      </div>
+    </div>
+
+    <div id="save-system-modal" class="w3-modal">
+    	<div class="w3-modal-content w3-border w3-border-black">
+    		<div class="w3-container w3-green">
+    			<div class="w3-padding">Save System</div>
+    			<span id="save-close-button" class="w3-button w3-display-topright">&times;</span>
+    		</div>
+    		<div class="w3-container">
+    			<form class="w3-padding" onsubmit="event.preventDefault(); return false;">
+    				<label>Save System As:</label>
+    				<input id="save-system-name" class="w3-input w3-border" type="text" value="system"/>
+    			</form>
+    		</div>
+    		<div class="w3-container w3-green">
+    			<button id="save-system-confirm-button" class="w3-button w3-right">Save</button>
+    		</div>
+    	</div>
+    </div>
+
+	<div id="save-png-modal" class="w3-modal">
+    	<div class="w3-modal-content w3-border w3-border-black">
+    		<div class="w3-container w3-green">
+    			<div class="w3-padding">PNG Properties</div>
+    			<span id="save-png-close-button" class="w3-button w3-display-topright">&times;</span>
+    		</div>
+    		<div class="w3-container">
+    			<form class="w3-padding" onsubmit="event.preventDefault(); return false;">
+    				<!-- <label>Save PNG As:</label>
+    				<input id="save-png-name" class="w3-input w3-border" type="text" value="system"/> -->
+
+					<input id="save-png-tile-type-name" name="save-png-tile-type-name" type="checkbox" value="names"/>
+					<label for="save-png-tile-type-name"> Include tile type names</label><br>
+
+					<input id="save-png-tile-type-label" name="save-png-tile-type-label" type="checkbox" value="labels" checked/>
+					<label for="save-png-tile-type-label"> Include tile type labels</label><br>
+    			</form>
+    		</div>
+    		<div class="w3-container w3-green">
+    			<button id="save-png-confirm-button" class="w3-button w3-right">Continue</button>
+    		</div>
+    	</div>
+    </div>
+
+	<div id="save-svg-modal" class="w3-modal">
+    	<div class="w3-modal-content w3-border w3-border-black">
+    		<div class="w3-container w3-green">
+    			<div class="w3-padding">PNG Properties</div>
+    			<span id="save-svg-close-button" class="w3-button w3-display-topright">&times;</span>
+    		</div>
+    		<div class="w3-container">
+    			<form class="w3-padding" onsubmit="event.preventDefault(); return false;">
+    				<!-- <label>Save PNG As:</label>
+    				<input id="save-png-name" class="w3-input w3-border" type="text" value="system"/> -->
+
+					<input id="save-svg-tile-type-name" name="save-svg-tile-type-name" type="checkbox" value="names"/>
+					<label for="save-svg-tile-type-name"> Include tile type names</label><br>
+
+					<input id="save-svg-tile-type-label" name="save-svg-tile-type-label" type="checkbox" value="labels" checked/>
+					<label for="save-svg-tile-type-label"> Include tile type labels</label><br>
+    			</form>
+    		</div>
+    		<div class="w3-container w3-green">
+    			<button id="save-svg-confirm-button" class="w3-button w3-right">Continue</button>
+    		</div>
+    	</div>
+    </div>
+
+	<div id="set-simulation-mode-modal" class="w3-modal">
+    	<div class="w3-modal-content w3-border w3-border-black">
+    		<div class="w3-container w3-green">
+    			<div class="w3-padding">Set Simulation Mode</div>
+    			<span id="simulation-mode-close-button" class="w3-button w3-display-topright">&times;</span>
+    		</div>
+			<div class="w3-container">
+    			<form class="w3-padding" onsubmit="event.preventDefault(); return false;">
+    				<label>Simulation Mode Options:</label>
+					<select id="simulation-mode-select" class="w3-select w3-border" name="option">
+						<option value="aTAM">aTAM</option>
+						<option value="SyncTAM">SyncTAM</option>
+						<option value="BlockTAM">BlockTAM</option>
+						</select>
+    			</form>
+    		</div>
+    		<div class="w3-container w3-green">
+    			<button id="set-simulation-mode-confirm-button" class="w3-button w3-right">Set Mode</button>
+    		</div>
+    	</div>
+    </div>
+
+    <div id="set-temperature-modal" class="w3-modal">
+    	<div class="w3-modal-content w3-border w3-border-black">
+    		<div class="w3-container w3-green">
+    			<div class="w3-padding">Set Temperature</div>
+    			<span id="temperature-close-button" class="w3-button w3-display-topright">&times;</span>
+    		</div>
+    		<div class="w3-container">
+    			<form class="w3-padding">
+    				<label>Temperature:</label>
+    				<input id="temperature-input" class="w3-input w3-border" type="text" value="2"/>
+    			</form>
+    		</div>
+    		<div class="w3-container w3-green">
+    			<button id="set-temperature-confirm-button" class="w3-button w3-right">Set</button>
+    		</div>
+    	</div>
+    </div>
+
+	<div id="set-temperature-sequence-modal" class="w3-modal">
+    	<div class="w3-modal-content w3-border w3-border-black">
+    		<div class="w3-container w3-green">
+    			<div class="w3-padding">Set Temperature Sequence</div>
+    			<span id="temperature-sequence-close-button" class="w3-button w3-display-topright">&times;</span>
+    		</div>
+    		<div class="w3-container">
+    			<form class="w3-padding">
+    				<label>Temperature Sequence:</label>
+    				<input id="temperature-sequence-input" class="w3-input w3-border" type="text" value="2"/>
+    			</form>
+    		</div>
+    		<div class="w3-container w3-green">
+    			<button id="set-temperature-sequence-confirm-button" class="w3-button w3-right">Set</button>
+    		</div>
+    	</div>
+    </div>
+
+    <div id="container">
+    	
+    	<!-- TILE LIST PANEL -->
+    	<div id="tile-list-panel">
+    		<div id="tile-list-header" class="w3-bar w3-green"><div class="w3-bar-item">Tile List</div></div>
+			  <div id="tile-list">
+			  	<button id="new-tile-button" class="tile-list-entry w3-border w3-button w3-small w3-light-gray w3-hover-green w3-left-align">
+			  	  <span class="material-icons w3-small">add_box</span> New Tile
+			  	</button>
+			  </div>
+    	</div>
+
+    	<!-- TILE VIEW PANEL -->
+    	<div id="tile-view-panel">
+    		<div id="tile-view-header" class="w3-bar w3-green"><div class="w3-bar-item">Selected Tile</div></div>
+    		<div id="tile-view">
+    			<canvas id="tile-canvas"></canvas>
+    		</div>
+    	</div>
+
+    	<!-- TILE PROPERTIES PANEL -->
+    	<div id="tile-properties-panel">
+    		<div id="tile-properties-header" class="w3-bar w3-green"><div class="w3-bar-item">Tile Properties</div></div>
+    		<div id="tile-properties"></div>
+    	</div>
+
+    	<!-- SIMULATOR PANEL -->
+    	<div id="simulator-panel" style="width: 100%">
+    		<div id="sim-bar" class="w3-bar w3-light-grey">
+			    <button id="fast-back-button" class="w3-bar-item w3-button"><span class="material-icons">fast_rewind</span></button>
+			    <button id="step-back-button" class="w3-bar-item w3-button"><span class="material-icons">skip_previous</span></button>
+			    <button id="stop-button" class="w3-bar-item w3-button"><span class="material-icons">stop</span></button>
+			    <button id="step-forward-button" class="w3-bar-item w3-button"><span class="material-icons">skip_next</span></button>
+			    <button id="fast-forward-button" class="w3-bar-item w3-button"><span class="material-icons">fast_forward</span></button>
+			    <div class="w3-bar-item bar-divider"></div>
+			    <button id="select-mode-button" class="w3-bar-item w3-button"><span class="material-icons">highlight_alt</span></button>
+			    <button id="place-mode-button" class="w3-bar-item w3-button"><span class="material-icons">edit</span></button>
+			    <button id="zoom-out-button" class="w3-bar-item w3-button w3-right"><span class="material-icons">zoom_out</span></button>
+			    <button id="zoom-in-button" class="w3-bar-item w3-button w3-right"><span class="material-icons">zoom_in</span></button>
+			  </div>
+			  <div id="simulator">
+			  	<canvas id="sim-canvas"></canvas>
+				  <svg id="sim-canvas" width="100%" height="100%"></svg>
+			  </div>
+			  <div id="sim-info" class="w3-small w3-light-grey">Simulator</div>
+    	</div>
+    	
+    	<!-- LOG PANEL -->
+    	<div id="log-panel">
+    		<div id="log-header" class="w3-bar w3-green"><div class="w3-bar-item">Simulation Log</div></div>
+    		<div id="log-container"></div>
+    	</div>
+
+    	<!-- RESIZE GUTTERS -->
+    	<div id="editor-gutter" class="gutter"></div>
+    	<div id="simulator-gutter" class="gutter"></div>
+    	<div id="log-gutter" class="gutter"></div>
+    	<div id="tile-gutter" class="gutter"></div>
+    </div>
+  </body>
+</html>
