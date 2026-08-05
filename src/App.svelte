@@ -1,6 +1,8 @@
 <script>
   import { onMount } from "svelte";
   import Split from "split-grid";
+
+  import * as Asset from "./assetManager.ts";
   
   import SimulatorView from "./SimulatorView.svelte";
   import TileView from "./TileView.svelte";
@@ -9,7 +11,6 @@
   let editor_gutter;
   let log_gutter;
   let simulator_gutter;
-  //let tile_gutter;
   
   onMount(() => {
       const split = Split({
@@ -25,6 +26,8 @@
               // update simulator here
 	  }
       });
+
+      Asset.loadStartupAssets(() => {});
 
       return () => { split.destroy(); };
   });

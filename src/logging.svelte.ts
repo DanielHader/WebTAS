@@ -36,8 +36,17 @@ class LogEntry {
     }
 }
 
-export const logEntries: LogEntry[] = []
+const logEntries = $state<LogEntry[]>([]);
 
-export function log(level: LogLevel, message: string) {
+function log(level: LogLevel, message: string) {
     logEntries.push(new LogEntry(level, message));
 }
+
+export function getEntries() {
+    return logEntries;
+}
+
+export function info(message: string)    { log(LogLevel.Info, message);    }
+export function debug(message: string)   { log(LogLevel.Debug, message);   }
+export function warning(message: string) { log(LogLevel.Warning, message); }
+export function error(message: string)   { log(LogLevel.Error, message);   }
